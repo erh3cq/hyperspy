@@ -24,39 +24,32 @@ from hyperspy.component import Component
 class VolumePlasmonDrude(Component):
 
     """Drude volume plasmon energy loss function component
-
     .. math::
-
        Energy loss function defined as:
-
        f(E) = \\frac{E(\Delta E_p)E_p^2}{(E^2-E_p^2)^2+(E\Delta E_p)^2}
-
     +------------+-----------------+
     | Parameter  |    Attribute    |
     +------------+-----------------+
     |    E_p     |  plasmon_energy |
     +------------+-----------------+
-    | delta_E_p  |      fwhm       |
+    | delta_E_p  |fwhm|
     +------------+-----------------+
     | intensity  |   intensity     |
     +------------+-----------------+
-
     Notes
     -----
     Refer to Egerton, R. F., Electron Energy-Loss Spectroscopy in the
     Electron Microscope, 2nd edition, Plenum Press 1996, pp. 154-158
     for details, including original equations.
-
-
     """
 
-    def __init__(self, intensity=1., plasmon_energy=15., fwhm=1.5):
+    def __init__(self):
         Component.__init__(self, ['intensity', 'plasmon_energy',
                                   'fwhm'])
         self._position = self.plasmon_energy
-        self.intensity.value = intensity
-        self.plasmon_energy.value = plasmon_energy
-        self.fwhm.value = fwhm
+        self.intensity.value = 1
+        self.plasmon_energy.value = 7.1
+        self.fwhm.value = 2.3
         self.plasmon_energy.grad = self.grad_plasmon_energy
         self.fwhm.grad = self.grad_fwhm
         self.intensity.grad = self.grad_intensity

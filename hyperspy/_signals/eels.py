@@ -57,10 +57,8 @@ class EELSSpectrum_mixin:
 
     def add_elements(self, elements, include_pre_edges=False):
         """Declare the elemental composition of the sample.
-
         The ionisation edges of the elements present in the current
         energy range will be added automatically.
-
         Parameters
         ----------
         elements : tuple of strings
@@ -70,17 +68,13 @@ class EELSSpectrum_mixin:
         include_pre_edges : bool
             If True, the ionization edges with an onset below the lower
             energy limit of the SI will be incluided
-
         Examples
         --------
-
         >>> s = hs.signals.EELSSpectrum(np.arange(1024))
         >>> s.add_elements(('C', 'O'))
-
         Raises
         ------
         ValueError
-
         """
         if not isiterable(elements) or isinstance(elements, str):
             raise ValueError(
@@ -107,13 +101,11 @@ class EELSSpectrum_mixin:
     def generate_subshells(self, include_pre_edges=False):
         """Calculate the subshells for the current energy range for the
         elements present in self.elements
-
         Parameters
         ----------
         include_pre_edges : bool
             If True, the ionization edges with an onset below the lower
             energy limit of the SI will be incluided
-
         """
         Eaxis = self.axes_manager.signal_axes[0].axis
         if not include_pre_edges:
@@ -137,34 +129,28 @@ class EELSSpectrum_mixin:
 
     def estimate_zero_loss_peak_centre(self, mask=None):
         """Estimate the posision of the zero-loss peak.
-
         This function provides just a coarse estimation of the position
         of the zero-loss peak centre by computing the position of the maximum
         of the spectra. For subpixel accuracy use `estimate_shift1D`.
-
         Parameters
         ----------
         mask : Signal1D of bool data type.
             It must have signal_dimension = 0 and navigation_shape equal to the
             current signal. Where mask is True the shift is not computed
             and set to nan.
-
         Returns
         -------
         zlpc : Signal1D subclass
             The estimated position of the maximum of the ZLP peak.
-
         Notes
         -----
         This function only works when the zero-loss peak is the most
         intense feature in the spectrum. If it is not in most cases
         the spectrum can be cropped to meet this criterium.
         Alternatively use `estimate_shift1D`.
-
         See Also
         --------
         estimate_shift1D, align_zero_loss_peak
-
         """
         self._check_signal_dimension_equals_one()
         self._check_navigation_mask(mask)
@@ -190,12 +176,10 @@ class EELSSpectrum_mixin:
             show_progressbar=None,
             **kwargs):
         """Align the zero-loss peak.
-
         This function first aligns the spectra using the result of
         `estimate_zero_loss_peak_centre` and afterward, if subpixel is True,
         proceeds to align with subpixel accuracy using `align1D`. The offset
         is automatically correct if `calibrate` is True.
-
         Parameters
         ----------
         calibrate : bool
@@ -225,30 +209,23 @@ class EELSSpectrum_mixin:
         show_progressbar : None or bool
             If True, display a progress bar. If None the default is set in
             `preferences`.
-
         Examples
         --------
         >>> s_ll = hs.signals.EELSSpectrum(np.zeros(1000))
         >>> s_ll.data[100] = 100
         >>> s_ll.align_zero_loss_peak()
-
         Aligning both the lowloss signal and another signal
         >>> s = hs.signals.EELSSpectrum(np.range(1000))
         >>> s_ll.align_zero_loss_peak(also_align=[s])
-
         Aligning within a narrow range of the lowloss signal
         >>> s_ll.align_zero_loss_peak(signal_range=(-10.,10.))
-
-
         See Also
         --------
         estimate_zero_loss_peak_centre, align1D, estimate_shift1D.
-
         Notes
         -----
         Any extra keyword arguments are passed to `align1D`. For
         more information read its docstring.
-
         """
         def substract_from_offset(value, signals):
             if isinstance(value, da.Array):
@@ -310,7 +287,6 @@ class EELSSpectrum_mixin:
             self, threshold, show_progressbar=None):
         """Rough estimation of the elastic scattering intensity by
         truncation of a EELS low-loss spectrum.
-
         Parameters
         ----------
         threshold : {Signal1D, float, int}
@@ -323,17 +299,13 @@ class EELSSpectrum_mixin:
         show_progressbar : None or bool
             If True, display a progress bar. If None the default is set in
             `preferences`.
-
-
         Returns
         -------
         I0: Signal1D
             The elastic scattering intensity.
-
         See Also
         --------
         estimate_elastic_scattering_threshold
-
         """
         # TODO: Write units tests
         self._check_signal_dimension_equals_one()
@@ -390,7 +362,6 @@ class EELSSpectrum_mixin:
                                               start=1.):
         """Calculate the first inflexion point of the spectrum derivative
         within a window.
-
         This method assumes that the zero-loss peak is located at position zero
         in all the spectra. Currently it looks for an inflexion point, that can
         be a local maximum or minimum. Therefore, to estimate the elastic
@@ -399,7 +370,6 @@ class EELSSpectrum_mixin:
         more than one inflexion point in energy the window it selects the
         smoother one what, often, but not always, is a good choice in this
         case.
-
         Parameters
         ----------
         window : {None, float}
@@ -422,31 +392,23 @@ class EELSSpectrum_mixin:
         start : float
             Position from the zero-loss peak centre from where to start
             looking for the inflexion point.
-
-
         Returns
         -------
-
         threshold : Signal1D
             A Signal1D of the same dimension as the input spectrum
             navigation space containing the estimated threshold. Where the
             threshold couldn't be estimated the value is set to nan.
-
         See Also
         --------
-
         estimate_elastic_scattering_intensity,align_zero_loss_peak,
         find_peaks1D_ohaver, fourier_ratio_deconvolution.
-
         Notes
         -----
-
         The main purpose of this method is to be used as input for
         `estimate_elastic_scattering_intensity`. Indeed, for currently
         achievable energy resolutions, there is not such a thing as a elastic
         scattering threshold. Therefore, please be aware of the limitations of
         this method when using it.
-
         """
         self._check_signal_dimension_equals_one()
         # Create threshold with the same shape as the navigation dims.
@@ -499,11 +461,9 @@ class EELSSpectrum_mixin:
                            zlp=None,):
         """Estimates the thickness (relative to the mean free path)
         of a sample using the log-ratio method.
-
         The current EELS spectrum must be a low-loss spectrum containing
         the zero-loss peak. The hyperspectrum must be well calibrated
         and aligned.
-
         Parameters
         ----------
         threshold : {Signal1D, float, int}
@@ -518,19 +478,16 @@ class EELSSpectrum_mixin:
             spectrum supplied by integration using Simpson's rule. If None
             estimates the zero-loss peak intensity using
             `estimate_elastic_scattering_intensity` by truncation.
-
         Returns
         -------
         s : Signal1D
             The thickness relative to the MFP. It returns a Signal1D,
             Signal2D or a BaseSignal, depending on the current navigation
             dimensions.
-
         Notes
         -----
         For details see: Egerton, R. Electron Energy-Loss
         Spectroscopy in the Electron Microscope. Springer-Verlag, 2011.
-
         """
         # TODO: Write units tests
         self._check_signal_dimension_equals_one()
@@ -564,28 +521,23 @@ class EELSSpectrum_mixin:
                                   add_zlp=False,
                                   crop=False):
         """Performs fourier-log deconvolution.
-
         Parameters
         ----------
         zlp : EELSSpectrum
             The corresponding zero-loss peak.
-
         add_zlp : bool
             If True, adds the ZLP to the deconvolved spectrum
         crop : bool
             If True crop the spectrum to leave out the channels that
             have been modified to decay smoothly to zero at the sides
             of the spectrum.
-
         Returns
         -------
         An EELSSpectrum containing the current data deconvolved.
-
         Notes
         -----
         For details see: Egerton, R. Electron Energy-Loss
         Spectroscopy in the Electron Microscope. Springer-Verlag, 2011.
-
         """
         self._check_signal_dimension_equals_one()
         s = self.deepcopy()
@@ -648,16 +600,13 @@ class EELSSpectrum_mixin:
                                     extrapolate_lowloss=True,
                                     extrapolate_coreloss=True):
         """Performs Fourier-ratio deconvolution.
-
         The core-loss should have the background removed. To reduce
          the noise amplication the result is convolved with a
         Gaussian function.
-
         Parameters
         ----------
         ll: EELSSpectrum
             The corresponding low-loss (ll) EELSSpectrum.
-
         fwhm : float or None
             Full-width half-maximum of the Gaussian function by which
             the result of the deconvolution is convolved. It can be
@@ -670,12 +619,10 @@ class EELSSpectrum_mixin:
              first minimum after the ZLP centre.
         extrapolate_lowloss, extrapolate_coreloss : bool
             If True the signals are extrapolated using a power law,
-
         Notes
         -----
         For details see: Egerton, R. Electron Energy-Loss
         Spectroscopy in the Electron Microscope. Springer-Verlag, 2011.
-
         """
         self._check_signal_dimension_equals_one()
         orig_cl_size = self.axes_manager.signal_axes[0].size
@@ -751,114 +698,12 @@ class EELSSpectrum_mixin:
                 self.tmp_parameters.filename +
                 'after_fourier_ratio_deconvolution')
         return cl
-    
-    def fourier_ratio_deconvolution_llspectra(self, kernel, zl=None,
-                                        fwhm=None,
-                                        threshold=None):
-        """Performs Fourier-ratio deconvolution of two similar spectrum.
-        
-        Parameters
-        ----------
-        kernel: EELSSpectrum
-            The spectrum to be deconvolved from parent spectrum
-        zl: ZLP spectrum to avoid Gaussian aproximation of ZLP
-        fwhm : float or None
-            Full-width half-maximum of the Gaussian function by which
-            the end convolved ZLP is initially approximated as.  If
-            None, the FWHM of the zero-loss peak of the low-loss is
-            estimated and used.
-        threshold : {None, float}
-            Truncation energy to estimate the intensity of the
-            elastic scattering. If None the threshold is taken as the
-             first minimum after the ZLP centre.
-        
-        Notes
-        -----
-        Wang, Feng, Ray Egerton, and Marek Malac. “Fourier-Ratio Deconvolution
-        Techniques for Electron Energy-Loss Spectroscopy (EELS).”
-        Ultramicroscopy 109, no. 10 (September 2009): 1245–49.
-        doi:10.1016/j.ultramic.2009.05.011.
-        """
-        
-        self._check_signal_dimension_equals_one()
-        orig_spectrum_size = self.axes_manager.signal_axes[0].size
-    
-        if zl is None:
-            zl_provided = False
-            if threshold is None:
-                threshold = kernel.estimate_elastic_scattering_threshold()
-        else:
-            zl_provided = True
-    
-        spectrum = self.deepcopy()
-        kernel = kernel.deepcopy()
-        
-        kernel.hanning_taper()
-        spectrum.hanning_taper()
-        
-        kernel_size = kernel.axes_manager.signal_axes[0].size
-        spectrum_size = spectrum.axes_manager.signal_axes[0].size
-        # Conservative new size to solve the wrap-around problem
-        size = kernel_size + spectrum_size - 1
-        # Increase to the closest multiple of two to enhance the FFT
-        # performance
-        size = int(2 ** np.ceil(np.log2(size)))
-        
-        axis = kernel.axes_manager.signal_axes[0]
-        js = np.fft.rfft(spectrum.data, n=size, axis=axis.index_in_array)
-        jk = np.fft.rfft(kernel.data, n=size, axis=axis.index_in_array)
-    
-        if not zl_provided:
-            print('No zero loss provided')
-            if fwhm is None:
-                fwhm = float(kernel.get_current_signal().estimate_peak_width()())
-                _logger.info("FWHM = %1.2f" % fwhm)
-            
-            I0 = kernel.estimate_elastic_scattering_intensity(threshold=threshold)
-            I0 = I0.data
-            if kernel.axes_manager.navigation_size > 0:
-                I0_shape = list(I0.shape)
-                I0_shape.insert(axis.index_in_array, 1)
-                I0 = I0.reshape(I0_shape)
-            
-            from hyperspy.components1d import Gaussian
-            g = Gaussian()
-            g.sigma.value = fwhm / 2.3548
-            g.A.value = 1
-            g.centre.value = 0
-            zl = g.function(
-                np.linspace(axis.offset,
-                            axis.offset + axis.scale * (size - 1),
-                            size))
-            z = np.fft.rfft(zl)
-            zshape = [1, ] * len(spectrum.data.shape)
-            zshape[axis.index_in_array] = js.shape[axis.index_in_array]
-        else:
-            I0 = zl.estimate_elastic_scattering_intensity(threshold=10.).data
-            if kernel.axes_manager.navigation_size > 0:
-                I0_shape = list(I0.shape)
-                I0_shape.insert(axis.index_in_array, 1)
-                I0 = I0.reshape(I0_shape)
-            z = np.fft.rfft(zl/I0, n=size, axis=axis.index_in_array)
-            
-        spectrum.data = np.fft.irfft(z * js / jk,
-                               axis=axis.index_in_array)
-        spectrum.data *= I0
-        spectrum.crop(-1, None, int(orig_spectrum_size))
-        spectrum.metadata.General.title = (spectrum.metadata.General.title +
-                                     ' after Fourier-ratio deconvolution')
-        if spectrum.tmp_parameters.has_item('filename'):
-            spectrum.tmp_parameters.filename = (
-                spectrum.tmp_parameters.filename +
-                'after_fourier_ratio_deconvolution')
-        return spectrum
 
     def richardson_lucy_deconvolution(self, psf, iterations=15, mask=None,
                                       show_progressbar=None,
                                       parallel=None):
         """1D Richardson-Lucy Poissonian deconvolution of
         the spectrum by the given kernel.
-
         Parameters
         ----------
         iterations: int
@@ -874,14 +719,12 @@ class EELSSpectrum_mixin:
         parallel : {None,bool,int}
             if True, the deconvolution will be performed in a threaded (parallel)
             manner.
-
         Notes:
         -----
         For details on the algorithm see Gloter, A., A. Douiri,
         M. Tence, and C. Colliex. “Improving Energy Resolution of
         EELS Spectra: An Alternative to the Monochromator Solution.”
         Ultramicroscopy 96, no. 3–4 (September 2003): 385–400.
-
         """
         if show_progressbar is None:
             show_progressbar = preferences.General.show_progressbar
@@ -949,10 +792,8 @@ class EELSSpectrum_mixin:
                                   collection_angle=None):
         """Set the microscope parameters that are necessary to calculate
         the GOS.
-
         If not all of them are defined, raises in interactive mode
         raises an UI item to fill the values
-
         beam_energy: float
             The energy of the electron beam in keV
         convengence_angle : float
@@ -1009,8 +850,6 @@ class EELSSpectrum_mixin:
                                 add_noise=False,
                                 fix_neg_r=False):
         """Extrapolate the spectrum to the right using a powerlaw
-
-
         Parameters
         ----------
         window_size : int
@@ -1025,11 +864,9 @@ class EELSSpectrum_mixin:
             If True, the negative values for the "components.PowerLaw"
             parameter r will be flagged and the extrapolation will be
             done with a constant zero-value.
-
         Returns
         -------
         A new spectrum, with the extrapolation.
-
         """
         self._check_signal_dimension_equals_one()
         axis = self.axes_manager.signal_axes[0]
@@ -1113,7 +950,6 @@ class EELSSpectrum_mixin:
         """Calculate the complex
         dielectric function from a single scattering distribution (SSD) using
         the Kramers-Kronig relations.
-
         It uses the FFT method as in [Egerton2011]_.  The SSD is an
         EELSSpectrum instance containing SSD low-loss EELS with no zero-loss
         peak. The internal loop is devised to approximately subtract the
@@ -1121,10 +957,8 @@ class EELSSpectrum_mixin:
         neglecting coupling between the surfaces. This method does not account
         for retardation effects, instrumental broading and surface plasmon
         excitation in particles.
-
         Note that either refractive index or thickness are required.
         If both are None or if both are provided an exception is raised.
-
         Parameters
         ----------
         zlp: {None, number, Signal1D}
@@ -1163,7 +997,6 @@ class EELSSpectrum_mixin:
             thickness if `t` is None and the estimated surface plasmon
             excitation and the spectrum corrected from surface plasmon
             excitations if `iterations` > 1.
-
         Returns
         -------
         eps: DielectricFunction instance
@@ -1172,15 +1005,12 @@ class EELSSpectrum_mixin:
             contained in an DielectricFunction instance.
         output: Dictionary (optional)
             A dictionary of optional outputs with the following keys:
-
             ``thickness``
                 The estimated  thickness in nm calculated by normalization of
                 the SSD (only when `t` is None)
-
             ``surface plasmon estimation``
                The estimated surface plasmon excitation (only if
                `iterations` > 1.)
-
         Raises
         ------
         ValuerError
@@ -1188,20 +1018,16 @@ class EELSSpectrum_mixin:
         AttribureError
             If the beam_energy or the collection semi-angle are not defined in
             metadata.
-
         Notes
         -----
         This method is based in Egerton's Matlab code [Egerton2011]_ with some
         minor differences:
-
         * The integrals are performed using the simpsom rule instead of using
           a summation.
         * The wrap-around problem when computing the ffts is workarounded by
           padding the signal instead of substracting the reflected tail.
-
         .. [Egerton2011] Ray Egerton, "Electron Energy-Loss
            Spectroscopy in the Electron Microscope", Springer-Verlag, 2011.
-
         """
         output = {}
         if iterations == 1:
@@ -1391,7 +1217,6 @@ class EELSSpectrum_mixin:
     def create_model(self, ll=None, auto_background=True, auto_add_edges=True,
                      GOS=None, dictionary=None):
         """Create a model for the current EELS data.
-
         Parameters
         ----------
         ll : EELSSpectrum, optional
@@ -1416,12 +1241,9 @@ class EELSSpectrum_mixin:
         dictionary : {None | dict}, optional
             A dictionary to be used to recreate a model. Usually generated
             using :meth:`hyperspy.model.as_dictionary`
-
         Returns
         -------
-
         model : `EELSModel` instance.
-
         """
         from hyperspy.models.eelsmodel import EELSModel
         model = EELSModel(self,
