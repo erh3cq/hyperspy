@@ -54,6 +54,7 @@ from hyperspy._components.pes_core_line_shape import PESCoreLineShape
 from hyperspy._components.volume_plasmon_drude import VolumePlasmonDrude
 from hyperspy._components.expression import Expression
 from hyperspy._components.begrenzungs import Begrenzungs
+from hyperspy._components.interface_mode_intensity import Interface_Mode_Intensity
 
 # Generating the documentation
 
