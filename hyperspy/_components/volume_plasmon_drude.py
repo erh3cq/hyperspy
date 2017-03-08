@@ -103,3 +103,12 @@ class VolumePlasmonDrude(Component):
 
     def grad_intensity(self, x):
         return self.function(x) / self.intensity.value
+
+    def integral_as_signal(self):
+        intensity = self.intensity.as_signal()
+        plasmon_energy = self.plasmon_energy.as_signal()
+        fwhm = self.fwhm.as_signal()
+        pe2 = plasmon_energy**2
+        fwhm2 = fwhm**2
+        denom = np.sqrt(fwhm2 * (pe2*4 - fwhm2))
+        return (intensity * pe2 * fwhm) /denom * (np.arctan((pe2*2-fwhm2)/denom)*2 + np.pi) * 1/2
