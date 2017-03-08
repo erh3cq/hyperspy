@@ -92,5 +92,5 @@ class Begrenzungs(Component):
         elif self._side == 'Right':
             return np.where(
                     x > self.x0.value,
-                    self.A.value * (np.log(1/self.B.value) - k0(2 * self.C.value * (self.x0.value - x))),
+                    self.A.value * (np.log(1/self.B.value) - k0(2 * self.C.value * (x - self.x0.value))),
                     0)
