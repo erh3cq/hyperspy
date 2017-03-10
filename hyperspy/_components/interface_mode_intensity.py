@@ -71,15 +71,15 @@ class Interface_Mode_Intensity(Component):
         if self._side == 'Both':
             return np.where(
                     x != self.x0.value,
-                    self.A.value * k0(2 *self.C.value * (self.x0.value - x)),
+                    -1*self.A.value * k0(2 *self.C.value * (self.x0.value - x)),
                     0)
         elif self._side == 'Left':
             return np.where(
                     x < self.x0.value,
-                    self.A.value * k0(2 *self.C.value * (self.x0.value - x)),
+                    -1*self.A.value * k0(2 *self.C.value * (self.x0.value - x)),
                     0)
         elif self._side == 'Right':
             return np.where(
                     x > self.x0.value,
-                    self.A.value * k0(2 *self.C.value * (x - self.x0.value)),
+                    -1*self.A.value * k0(2 *self.C.value * (x - self.x0.value)),
                     0)
