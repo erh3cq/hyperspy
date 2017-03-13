@@ -56,16 +56,30 @@ class Begrenzungs(Component):
 
     """
 
-    def __init__(self, spectrum, A=1, B=1, C=1, x0=0, side='Both'):
-        Component.__init__(self, ('A', 'B', 'C', 'x0'))
-        self._position = x0
-        self._side =side
+    def __init__(self, spectrum, A=1, B=1, C=1, x0=0, symetry='symetric'):
+        self.symetry=symetry
         
-        #Define values
-        self.x0.value = x0
-        self.A.value = A #note A=I*Im(1/eps)
-        self.B.value = B #note B=kym*v/omega
-        self.C.value = C #C=omega/v
+        if symetry=='symetric':
+            Component.__init__(self, ('A', 'B', 'C', 'x0'))
+            self._position = x0
+            
+            #Define values
+            self.x0.value = x0
+            self.A.value = A #note A=I*Im(1/eps)
+            self.B.value = B #note B=kym*v/omega
+            self.C.value = C #C=omega/v
+        elif symetry=='asymetric':
+            Component.__init__(self, ('A_left', 'B_left', 'C_left', 'A_right', 'B_right', 'C_right', 'x0'))
+            self._position = x0
+            
+            #Define values
+            self.x0.value = x0
+            self.A_left.value = A #note A=I*Im(1/eps)
+            self.B_left.value = B #note B=kym*v/omega
+            self.C_left.value = C #C=omega/v
+            self.A_right.value = A #note A=I*Im(1/eps)
+            self.B_right.value = B #note B=kym*v/omega
+            self.C_right.value = C #C=omega/v
         
         #Get scope meta
 #        beta = spectrum.metadata.Acquisition_instrument.TEM.Detector.EELS.collection_angle/1000 #[mrad]
@@ -79,18 +93,16 @@ class Begrenzungs(Component):
         
     def function(self, x):
         #kym = self.kym
-        if self._side == 'Both':
+        if self.symetry=='symetric':
             return np.where(
                     x != self.x0.value,
                     self.A.value * (np.log(1/self.B.value) - k0(2 *self.C.value * (self.x0.value - x))),
                     0)
-        elif self._side == 'Left':
+        elif self.symetry=='asymetric':
             return np.where(
                     x < self.x0.value,
-                    self.A.value * (np.log(1/self.B.value) - k0(2 * self.C.value * (self.x0.value - x))),
-                    0)
-        elif self._side == 'Right':
-            return np.where(
+                    self.A_left.value * (np.log(1/self.B_left.value) - k0(2 * self.C_left.value * (self.x0.value - x))),
+                    np.where(
                     x > self.x0.value,
-                    self.A.value * (np.log(1/self.B.value) - k0(2 * self.C.value * (x - self.x0.value))),
-                    0)
+                    self.A_right.value * (np.log(1/self.B_right.value) - k0(2 * self.C_right.value * (self.x0.value - x))),
+                    0))
