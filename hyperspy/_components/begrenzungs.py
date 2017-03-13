@@ -96,13 +96,13 @@ class Begrenzungs(Component):
         if self.symetry=='symetric':
             return np.where(
                     x != self.x0.value,
-                    self.A.value * (np.log(1/self.B.value) - k0(2 *self.C.value * (self.x0.value - x))),
+                    self.A.value * (np.log(1/self.B.value) - k0(2 *self.C.value * abs(x - self.x0.value))),
                     0)
         elif self.symetry=='asymetric':
             return np.where(
                     x < self.x0.value,
-                    self.A_left.value * (np.log(1/self.B_left.value) - k0(2 * self.C_left.value * (self.x0.value - x))),
+                    self.A_left.value * (np.log(1/self.B_left.value) - k0(2 * self.C_left.value * abs(x - self.x0.value))),
                     np.where(
                     x > self.x0.value,
-                    self.A_right.value * (np.log(1/self.B_right.value) - k0(2 * self.C_right.value * (self.x0.value - x))),
+                    self.A_right.value * (np.log(1/self.B_right.value) - k0(2 * self.C_right.value * abs(x - self.x0.value))),
                     0))
