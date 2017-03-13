@@ -56,39 +56,30 @@ class Interface_Mode_Intensity(Component):
 
     """
 
-    def __init__(self, spectrum, A=1, C=1, x0=0, symetry='symetric'):
-        self.symetry=symetry
+    def __init__(self, spectrum, A=1, C=1, x0=0, side='Both'):
+        Component.__init__(self, ('A', 'C', 'x0'))
+        self._position = x0
+        self._side =side
         
-        if symetry=='symetric':
-            Component.__init__(self, ('A', 'C', 'x0'))
-            self._position = x0
-            
-            #Define values
-            self.x0.value = x0
-            self.A.value = A #note A=I*Im(1/(eps1+eps2))
-            self.C.value = C #C=omega/v
-        elif symetry=='asymetric':
-            Component.__init__(self, ('A_left', 'C_left', 'A_right', 'C_right', 'x0'))
-            self._position = x0
-            
-            #Define values
-            self.x0.value = x0
-            self.A_left.value = A #note A=I*Im(1/(eps1+eps2))
-            self.C_left.value = C #C=omega/v
-            self.A_right.value = A #note A=I*Im(1/(eps1+eps2))
-            self.C_right.value = C #C=omega/v
+        #Define values
+        self.x0.value = x0
+        self.A.value = A #note A=I*Im(1/(eps1+eps2))
+        self.C.value = C #C=omega/v
+
         
     def function(self, x):
-        if self.symetry=='symetric':
+        if self._side == 'Both':
             return np.where(
                     x != self.x0.value,
-                    -1*self.A.value * k0(2 *self.C.value * abs(x - self.x0.value)),
+                    -1*self.A.value * k0(2 *self.C.value * (self.x0.value - x)),
                     0)
-        elif self.symetry=='asymetric':
+        elif self._side == 'Left':
             return np.where(
                     x < self.x0.value,
-                    -1*self.A_left.value * k0(2 *self.C_left.value * abs(x - self.x0.value)),
-                    np.where(
+                    -1*self.A.value * k0(2 *self.C.value * (self.x0.value - x)),
+                    0)
+        elif self._side == 'Right':
+            return np.where(
                     x > self.x0.value,
-                    -1*self.A_right.value * k0(2 *self.C_right.value * abs(x - self.x0.value)),
-                    0))
+                    -1*self.A.value * k0(2 *self.C.value * (x - self.x0.value)),
+                    0)
