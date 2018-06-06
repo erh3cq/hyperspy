@@ -34,14 +34,17 @@ For more details see each component docstring.
 from hyperspy._components.arctan import Arctan
 from hyperspy._components.bleasdale import Bleasdale
 from hyperspy._components.heaviside import HeavisideStep
+from hyperspy._components.ramp import Ramp
 from hyperspy._components.eels_double_power_law import DoublePowerLaw
 from hyperspy._components.eels_cl_edge import EELSCLEdge
 from hyperspy._components.error_function import Erf
 from hyperspy._components.exponential import Exponential
 from hyperspy._components.gaussian import Gaussian
+from hyperspy._components.gaussianCDF import GaussianCDF
 from hyperspy._components.gaussianhf import GaussianHF
 from hyperspy._components.logistic import Logistic
 from hyperspy._components.lorentzian import Lorentzian
+from hyperspy._components.lorentzianCDF import LorentzianCDF
 from hyperspy._components.offset import Offset
 from hyperspy._components.power_law import PowerLaw
 from hyperspy._components.pes_see import SEE
