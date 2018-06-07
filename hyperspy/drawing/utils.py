@@ -592,6 +592,52 @@ def plot_images(images,
               if sig.axes_manager.navigation_size > 0
               else 1)
 
+    # If no cmap given, get default colormap from pyplot:
+    if cmap is None:
+        cmap = [plt.get_cmap().name]
+    elif cmap == 'mpl_colors':
+        for n_color, c in enumerate(mpl.rcParams['axes.prop_cycle']):
+            make_cmap(colors=['#000000', c['color']],
+                      name='mpl{}'.format(n_color))
+        cmap = ['mpl{}'.format(i) for i in
+                range(len(mpl.rcParams['axes.prop_cycle']))]
+        __check_single_colorbar(colorbar)
+    # cmap is list, tuple, or something else iterable (but not string):
+    elif hasattr(cmap, '__iter__') and not isinstance(cmap, str):
+        try:
+            cmap = [c.name for c in cmap]  # convert colormap to string
+        except AttributeError:
+            cmap = [c for c in cmap]   # c should be string if not colormap
+        __check_single_colorbar(colorbar)
+    elif isinstance(cmap, mpl.colors.Colormap):
+        cmap = [cmap.name]   # convert single colormap to list with string
+    elif isinstance(cmap, str):
+        cmap = [cmap]  # cmap is single string, so make it a list
+    else:
+        # Didn't understand cmap input, so raise error
+        raise ValueError('The provided cmap value was not understood. Please '
+                         'check input values.')
+
+    # If any of the cmaps given are diverging, and auto-centering, set the
+    # appropriate flag:
+    if centre_colormap == "auto":
+        centre_colormaps = []
+        for c in cmap:
+            if c in MPL_DIVERGING_COLORMAPS:
+                centre_colormaps.append(True)
+            else:
+                centre_colormaps.append(False)
+    # if it was True, just convert to list
+    elif centre_colormap:
+        centre_colormaps = [True]
+    # likewise for false
+    elif not centre_colormap:
+        centre_colormaps = [False]
+
+    # finally, convert lists to cycle generators for adaptive length:
+    centre_colormaps = itertools.cycle(centre_colormaps)
+    cmap = itertools.cycle(cmap)
+
     def _check_arg(arg, default_value, arg_name):
         if isinstance(arg, list):
             if len(arg) != n:
@@ -618,7 +664,7 @@ def plot_images(images,
         # Use some heuristics to try to get base string of similar titles
 
         # in case of single image
-        if len(images) > 1:
+        if isinstance(images, list) or len(images) > 1:
             label_list = [x.metadata.General.title for x in images]
         else:
             label_list = [images.metadata.General.title]
@@ -758,7 +804,7 @@ def plot_images(images,
                             'single colorbar')
         else:
             g_vmax = vmax if vmax is not None else g_vmax
-        if centre_colormap:
+        if next(centre_colormaps):
             g_vmin, g_vmax = centre_colormap_values(g_vmin, g_vmax)
 
     # Check if we need to add a scalebar for some of the images
@@ -793,7 +839,7 @@ def plot_images(images,
                     data, saturated_pixels[idx])
                 l_vmin = vmin[idx] if vmin[idx] is not None else l_vmin
                 l_vmax = vmax[idx] if vmax[idx] is not None else l_vmax
-                if centre_colormap:
+                if centre:
                     l_vmin, l_vmax = centre_colormap_values(l_vmin, l_vmax)
 
             # Remove NaNs (if requested)
@@ -817,8 +863,8 @@ def plot_images(images,
 
             if not isinstance(aspect, (int, float)) and aspect not in [
                     'auto', 'square', 'equal']:
-                print('Did not understand aspect ratio input. '
-                      'Using \'auto\' as default.')
+                _logger.warning("Did not understand aspect ratio input. "
+                                "Using 'auto' as default.")
                 aspect = 'auto'
 
             if aspect is 'auto':
@@ -1012,7 +1058,8 @@ def make_cmap(colors, name='my_colormap', position=None,
     def _html_color_to_rgb(color_string):
         """ convert #RRGGBB to an (R, G, B) tuple """
         color_string = color_string.strip()
-        if color_string[0] == '#': color_string = color_string[1:]
+        if color_string[0] == '#':
+            color_string = color_string[1:]
         if len(color_string) != 6:
             raise ValueError(
                 "input #{} is not in #RRGGBB format".format(color_string))
@@ -1131,8 +1178,8 @@ def plot_spectra(
 
     def _reverse_legend(ax_, legend_loc_):
         """
-        Reverse the ordering of a matplotlib legend (to be more consistent 
-        with the default ordering of plots in the 'cascade' and 'overlap' 
+        Reverse the ordering of a matplotlib legend (to be more consistent
+        with the default ordering of plots in the 'cascade' and 'overlap'
         styles
 
         Parameters
@@ -1140,7 +1187,7 @@ def plot_spectra(
         ax_: matplotlib axes
 
         legend_loc_: str or int
-            This parameter controls where the legend is placed on the 
+            This parameter controls where the legend is placed on the
             figure; see the pyplot.legend docstring for valid values
         """
         l = ax_.get_legend()
